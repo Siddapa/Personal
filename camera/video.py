@@ -1,19 +1,16 @@
 import cv2
-from sockets.server import Server
 
-cam = cv2.VideoCapture(0)
-client = Client('127.0.0.1', 54321)
+class Camera:
+    cam = None
+    client = None
 
-while 1:
-    ret, frame = cam.read()
-    print(type(frame))
+    def __init__(self, id, client):
+        self.cam = cv2.VideoCapture(id)
+        self.client = client
 
-    if not ret:
-        print('failed')
-        break
-
-    client.send(frame)
+    def capture(self):
+        self.client.send(b'hello')
     
-
-cv2.release()
-cv2.destroyAllWindows()
+    def collapse(self):
+        cv2.release()
+        cv2.destroyAllWindows()

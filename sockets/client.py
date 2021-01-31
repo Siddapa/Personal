@@ -1,4 +1,5 @@
 import socket
+import keyboard
 
 class Client:
     HOST = ''
@@ -11,6 +12,7 @@ class Client:
     
     def send(self, message):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            s.sendall(message)
-            data = s.recv(1024)
+            s.connect((self.HOST, self.PORT))
+            while 1:
+                keyboard.wait('esc')
+                s.sendall(message)
