@@ -1,4 +1,4 @@
-package FTC;
+package ftc;
 
 public class Autonomous{
     private Drivetrain drivetrain;

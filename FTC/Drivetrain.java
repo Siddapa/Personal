@@ -1,4 +1,4 @@
-package FTC;
+package ftc;
 
 /**
  * Drivetrain -- handles movement of the drive wheels.

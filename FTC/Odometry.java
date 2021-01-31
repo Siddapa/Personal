@@ -1,4 +1,4 @@
-package FTC;
+package ftc;
 
 /**
  * Tracks position relative to starting location Currently uses motor encoders

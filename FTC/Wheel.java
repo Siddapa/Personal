@@ -1,4 +1,4 @@
-package FTC;
+package ftc;
 
 public class Wheel {
     private double power;

@@ -1,4 +1,4 @@
-package FTC;
+package ftc;
 
 public class Run {
     public static void main(String[] args) {
