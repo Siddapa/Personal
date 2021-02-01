@@ -9,7 +9,9 @@ class Camera:
         self.client = client
 
     def capture(self):
-        self.client.send(b'hello')
+        _, frame = self.cam.read()
+        byte_frame = cv2.imencode('.jpg', frame)[1].tostring()
+        self.client.send(byte_frame)
     
     def collapse(self):
         cv2.release()

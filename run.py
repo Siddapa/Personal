@@ -10,7 +10,7 @@ from webcam.video import Camera
 
 def run_server():
     server = Server('127.0.0.1', 54321)
-    server.connect()
+    server.listen()
 
 
 def capture_camera():

