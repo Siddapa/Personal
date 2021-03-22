@@ -7,7 +7,7 @@
 
 // Access from ARM Running Linux
 
-#define BCM2708_PERI_BASE 0x20000000
+#define BCM2708_PERI_BASE 0x3F000000
 #define GPIO_BASE (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
 
 #include <stdio.h>
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
  \************************************************************************/
 
     // TODO Fill with pin setting here
-    /*for (i = 7; i <= 23, i++)
+    for (i = 0; i <= 15, i++)
     {
         INP_GPIO(i);
         OUT_GPIO(i);
@@ -103,18 +103,9 @@ int main(int argc, char **argv)
             int target_pin = i % 16
             GPIO_CLR = 1<<target_pin
         }
-        
     }
-
     fclose(fp);
-    */
-    INP_GPIO(4)
-    OUT_GPIO(4)
-
-    while(1){
-        GPIO_SET = 1<<4;
-        GPIO_CLEAR = 1<<4;
-    }
+    return 0;
 } // main
 
 //
