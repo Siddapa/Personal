@@ -42,6 +42,8 @@ volatile unsigned *gpio;
 
 void setup_io();
 
+void output(int start_bit, int end_bit, int start_pin, int end_pin);
+
 void printButton(int g)
 {
     if (GET_GPIO(g)) // !=0 <-> bit is 1 <- port is HIGH=3.3V
@@ -67,44 +69,69 @@ int main(int argc, char **argv)
  \************************************************************************/
 
     // TODO Fill with pin setting here
+    // Pins 0 to 15 for 16-bit color
+    // 0-4 for Red (inclusive)
+    // 5-10 for Green (inclusive)
+    // 11-15 for Blue (inclusive)
+    
     for (i = 0; i <= 15, i++)
     {
         INP_GPIO(i);
         OUT_GPIO(i);
     }
 
-    FILE *fp;
-    char ch;
-    int count = 0;
-    char filename[] = "red.txt";
-    fp = fopen(filename, "r");
-    if (fp == NULL){
+    char red_filename[] = "red.txt";
+    char green_filename[] = "green.txt";
+    char blue_filename[] = "blue.txt";
+    FILE* red_bin = fopen(red_filename, "r");
+    FILE* green_bin = fopen(green_filename, "r");
+    FILE* blue_bin = fopen(blue_filename, "r");
+    int red_count = 0;
+    int green_count = 0;
+    int blue_count = 0;
+    if (red_bin == NULL || green_bin == NULL || blue_bin == NULL){
         printf("File is not available \n");
     }
     else{
-        for (c = getc(fp); c!- EOF; c = getc(fp)){
-            count = count + 1
+        for (c = getc(red_bin); c != EOF; c = getc(red_bin)){
+            red_count = red_count + 1
+        }
+        for (c = getc(green_bin); c != EOF; c = getc(green_bin)){
+            green_count = green_count + 1
+        }
+        for (c = getc(red_bin); c != EOF; c = getc(red_bin)){
+            blue_count = blue_count + 1
         }
     }
 
-    int vals[count];
+    int red_bits[red_count];
+    int green_bits[green_count];
+    int blue_bits[blue_count];
     int index = 0;
-    while ((ch = fgetc(fp)) != EOF){
-        vals[index] = ch;
+    while ((ch = fgetc(red_bin)) != EOF){
+        red_vals[index] = ch;
+        index = index + 1;
+    }
+    index = 0;
+    while ((ch = fgetc(green_bin)) != EOF){
+        green_vals[index] = ch;
+        index = index + 1;
+    }
+    index = 0;
+    while ((ch = fgetc(blue_bin)) != EOF){
+        blue_vals[index] = ch;
         index = index + 1;
     }
 
-    for(int i = 0; i <= count - 1; i++){
-        if (vals[i] == 1){
-            int target_pin = i % 16
-            GPIO_SET = 1<<target_pin
-            GPIO_CLR = 1<<target_pin
-        } else if (vals[i] == 0){
-            int target_pin = i % 16
-            GPIO_CLR = 1<<target_pin
-        }
+    for (int i = 0; i <= index/5; i++){
+        output(red_bits[(i*5)..((i+1)*5)], 0, 4)
+        output(green_bits[(i*6)..((i+1)*6)], 5, 10)
+        output(blue_bits[(i*5)..((i+1)*5)], 11, 15)
     }
-    fclose(fp);
+
+    fclose(red_bin);
+    fclose(green_bin);
+    fclose(blue_bin);
     return 0;
 } // main
 
@@ -142,3 +169,15 @@ void setup_io()
     gpio = (volatile unsigned *)gpio_map;
 
 } // setup_io
+
+
+void output(int bits[], int start_pin, int end_pin){
+    for (int i = start_pin; i <= end_pin, i++){
+        if (bits[i] == 1){
+            GPIO_SET = 1<<i
+            GPIO_CLR = 1<<i
+        } else if (bits[i] == 0) {
+            GPIO_CLR = 1<<i
+        }
+    }
+}
