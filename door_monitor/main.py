@@ -37,7 +37,7 @@ def img2bin():
             with open(green_bin, 'w') as file:
                 for row in resized:
                     for pixel in row:
-                        true_value = int((pixel[1]/255) * 63) # Scales to 5-bit
+                        true_value = int((pixel[1]/255) * 63) # Scales to 6-bit
                         binary = bin(true_value)
                         file.write(binary[2:]) # Removes '0b' part of binary literal
 
