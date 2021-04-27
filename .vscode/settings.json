@@ -1,4 +1,13 @@
 {
-    "python.pythonPath": "C:\\Program Files\\Python39\\python.exe",
-    "python.autoComplete.extraPaths": ["..app"]
+    "python.pythonPath": "C:\\Users\\vishn\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+    "python.autoComplete.extraPaths": [
+        "..app"
+    ],
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "stdio.h": "c"
+    },
+    "java.project.sourcePaths": [
+        ""
+    ]
 }

@@ -44,5 +44,7 @@ def recover(st):
     print(final)
     return final
 
+def 
+
 if __name__ == '__main__':
     recover("NEOTWONEINEIGHTOWSVEEN")

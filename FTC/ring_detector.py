@@ -1,45 +1,61 @@
-import numpy as numpy
+import numpy as np
 import cv2 as cv
 from time import time
 
+def getCornersFromPoints(points):
+    minX = 0
+    minY = 0
+    maxX = 0
+    maxY = 0
+
+    for point in points:
+        x = point[0][0]
+        y = point[0][1]
+
+        if (minX == 0 or x < minX):
+            minX = x
+        if (minY == 0 or y < minY):
+            minY = y
+        if (maxX == 0 or x > maxX):
+            maxX = x
+        if (maxY == 0 or y > maxY):
+            maxY = y
+
+    corners = [(minX, minY), (minX, maxY), (maxX, minY), (maxX, maxY)]
+    return corners
+
 start = time()
-img = cv.imread('blah3.jpg')
-img = cv.resize(img, (640, 480))
-cv.imshow('rings_orig', img)
-img = cv.cvtColor(img, cv.COLOR_RGB2HSV)
-cv.imshow('rings_hsv', img)
+img = cv.imread('C:\\Users\\vishn\\Documents\\Personal\\FTC\\Auto_Aim_Images\\blah.jpg')
+resized = cv.resize(img, (800, 448))
+bgr = cv.cvtColor(resized, cv.COLOR_RGBA2BGR)
+hls = cv.cvtColor(bgr, cv.COLOR_BGR2HLS)
+blurred = cv.blur(hls, (1, 1))
 
 # 17, 235, 148
-orange_lower_range = np.array([13, 50, 50])
-orange_upper_range = np.array([255, 255, 255])
+lower_range = np.array([0, 50, 150])
+upper_range = np.array([20, 100, 255])
+binary = cv.inRange(blurred, lower_range, upper_range)
+contours, hierarchy = cv.findContours(binary, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
-orange_mask = cv.inRange(img, orange_lower_range, orange_upper_range)
-result = cv.bitwise_and(img, img, mask=orange_mask)
-
-result = cv.cvtColor(result, cv.COLOR_HSV2BGR)
-
-top_left = (265, 210)
-bottom_right = (279, 215)
-low_lum = 60
-high_lum = 100
-
-gray = cv.cvtColor(result, cv.COLOR_BGR2GRAY)
-blur = cv.blur(gray, (3, 3))
-ret, thresh = cv.threshold(blur, 0, 150, cv.THRESH_BINARY)
-
-contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-
-#4000 is area for 4 rings
-#3000 is are for 1 ring
-contour_color = (0, 255, 0)
+maxArea = -1
+maxContourIndex = -1
 for index, contour in enumerate(contours):
     area = cv.contourArea(contour)
-    if area > 1000:
-        cv.drawContours(result, contours, index, contour_color, 1, 8, hierarchy)
-        print(area)
+    if area > maxArea:
+        maxContourIndex = index
+        maxArea = area
+contoured = cv.drawContours(resized, contours, maxContourIndex, (0, 255, 0), 2)
 
-stop = time()
-print(stop-start)
-cv.imshow('rings_masked', result)
-cv.waitKey(0)
+biggest = contours[maxContourIndex]
+corners = getCornersFromPoints(biggest)
+x_center = (corners[0][0]+corners[3][0])/2
+pixel_turn = 400 - x_center
+print(pixel_turn)
+
+end = time()
+cv.imshow('Final', contoured)
+cv.imwrite('Contoured.jpg', contoured)
+
+
+cv.waitKey()
 cv.destroyAllWindows()

@@ -52,7 +52,7 @@ void printButton(int g)
         printf("Button released!\n");
 }
 
-int main(int argc, char **argv)
+void main(int argc, char **argv)
 {
     int g, rep;
 
@@ -67,12 +67,6 @@ int main(int argc, char **argv)
   * It might be a good idea to 'sync' before running this program        *
   * so at least you still have your code changes written to the SD-card! *
  \************************************************************************/
-
-    // TODO Fill with pin setting here
-    // Pins 0 to 15 for 16-bit color
-    // 0-4 for Red (inclusive)
-    // 5-10 for Green (inclusive)
-    // 11-15 for Blue (inclusive)
     
     for (i = 0; i <= 15, i++)
     {
@@ -89,6 +83,7 @@ int main(int argc, char **argv)
     int red_count = 0;
     int green_count = 0;
     int blue_count = 0;
+
     if (red_bin == NULL || green_bin == NULL || blue_bin == NULL){
         printf("File is not available \n");
     }
@@ -132,7 +127,6 @@ int main(int argc, char **argv)
     fclose(red_bin);
     fclose(green_bin);
     fclose(blue_bin);
-    return 0;
 } // main
 
 //
