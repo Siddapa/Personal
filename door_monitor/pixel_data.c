@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <string.h>
 
 #define PAGE_SIZE (4 * 1024)
 #define BLOCK_SIZE (4 * 1024)
@@ -42,7 +43,7 @@ volatile unsigned *gpio;
 
 void setup_io();
 
-void output(int start_bit, int end_bit, int start_pin, int end_pin);
+void output(int bits[], int start_pin, int end_pin);
 
 void printButton(int g)
 {
@@ -52,7 +53,7 @@ void printButton(int g)
         printf("Button released!\n");
 }
 
-void main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
     int g, rep;
 
@@ -68,34 +69,40 @@ void main(int argc, char **argv)
   * so at least you still have your code changes written to the SD-card! *
  \************************************************************************/
 
-    for (i = 0; i <= 15, i++)
+    // TODO Fill with pin setting here
+    // Pins 0 to 15 for 16-bit color
+    // 0-4 for Red (inclusive)
+    // 5-10 for Green (inclusive)
+    // 11-15 for Blue (inclusive)
+
+    for (i = 0; i <= 15; i++)
     {
         INP_GPIO(i);
         OUT_GPIO(i);
     }
 
-    char red_filename[] = "red.txt";
-    char green_filename[] = "green.txt";
-    char blue_filename[] = "blue.txt";
+    char file_path[6] = strcat("bins/", argv[0]);
+    char red_filename[] = strcat(file_path, "red.txt");
+    char green_filename[] = strcat(file_path, "green.txt");
+    char blue_filename[] = strcat(file_path, "blue.txt");
     FILE* red_bin = fopen(red_filename, "r");
     FILE* green_bin = fopen(green_filename, "r");
     FILE* blue_bin = fopen(blue_filename, "r");
     int red_count = 0;
     int green_count = 0;
     int blue_count = 0;
-
     if (red_bin == NULL || green_bin == NULL || blue_bin == NULL){
         printf("File is not available \n");
     }
     else{
         for (c = getc(red_bin); c != EOF; c = getc(red_bin)){
-            red_count = red_count + 1
+            red_count = red_count + 1;
         }
         for (c = getc(green_bin); c != EOF; c = getc(green_bin)){
-            green_count = green_count + 1
+            green_count = green_count + 1;
         }
         for (c = getc(red_bin); c != EOF; c = getc(red_bin)){
-            blue_count = blue_count + 1
+            blue_count = blue_count + 1;
         }
     }
 
@@ -118,16 +125,21 @@ void main(int argc, char **argv)
         index = index + 1;
     }
 
+    GPIO_SET = 1<<17 // DE Enable
     for (int i = 0; i <= index/5; i++){
+        GPIO_SET = 1<<16; // DCLK High
         output(red_bits[(i*5)..((i+1)*5)], 0, 4)
         output(green_bits[(i*6)..((i+1)*6)], 5, 10)
         output(blue_bits[(i*5)..((i+1)*5)], 11, 15)
+        GPIO_CLR = 1<<16; // DCLK Low
     }
+    GPIO_CLR = 1<<17 // DE Disable
 
     fclose(red_bin);
     fclose(green_bin);
     fclose(blue_bin);
-} // main
+    return 0;
+}
 
 //
 // Set up a memory regions to access GPIO
