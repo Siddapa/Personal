@@ -44,7 +44,20 @@ def recover(st):
     print(final)
     return final
 
-def 
+
+def check_type():
+    assembly = ''
+    while not keyboard.is_pressed('c'):
+        if keyboard.is_pressed('1'):
+            assembly += '1'
+        if keyboard.is_pressed('2'):
+            assembly += '2'
+        if keyboard.is_pressed('3'):
+            assembly += '3'
+        if keyboard.is_pressed('4'):
+            assembly += '4'
+    print(assembly)
+
 
 if __name__ == '__main__':
-    recover("NEOTWONEINEIGHTOWSVEEN")
+    check_type()

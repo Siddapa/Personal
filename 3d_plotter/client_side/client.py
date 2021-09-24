@@ -1,13 +1,16 @@
 import socket
+import os
 import cv2 as cv
 import numpy as np
+
 
 from edge_detect import EdgeDetect
 
 
 if __name__ == '__main__':
-    HOST = '192.168.68.143'
+    HOST = '192.168.68.126'
     PORT = 65432
+    os.chdir('C:\\Users\\vishn\\Personal\\3d_plotter\\client_side')
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
