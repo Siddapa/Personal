@@ -17,9 +17,11 @@ if __name__ == '__main__':
 
         filename = input('Input Filename with Extension: ')
         working_img = cv.imread('working_files/' + filename)
+
         detector = EdgeDetect(working_img)
         detector.adjust_image((5, 5))
         detector.find_canny_thresh()
+        
         cv.imwrite('final_files/canny.png', detector.img)
 
         with open('final_files/arr', 'wb') as f:
