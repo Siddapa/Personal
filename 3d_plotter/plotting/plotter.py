@@ -1,5 +1,5 @@
 from threading import Thread
-import RPi.GPIO as gpio
+import requests as gpio
 
 from hardware.stepper import XStepper, YStepper, ZStepper
 
