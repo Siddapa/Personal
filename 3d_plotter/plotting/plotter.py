@@ -1,7 +1,7 @@
 from threading import Thread
-import requests as gpio
+import RPi.GPIO as gpio
 
-from hardware.stepper import XStepper, YStepper, ZStepper
+from plotting.hardware.stepper import XStepper, YStepper, ZStepper
 
 
 class Plotter:
