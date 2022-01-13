@@ -1,1 +1,1 @@
-*.png, *.log, *.stackdump, _pycache_/
+*.log, *.stackdump, __pycache__/, *.pyc
