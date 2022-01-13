@@ -103,6 +103,22 @@ def brute_force():
     print(final_x)
 
 
+def longestCommonPrefix(strs) -> str:
+    prefix = ''
+    if len(strs) == 1:
+        return ''
+    for index, char in enumerate(strs[0]):
+        if len(char) == 0:
+            return ''
+        prefix += char
+        for word in strs:
+            if word[0:index + 1] != prefix:
+                if len(prefix) == 1:
+                    return ''
+                print(prefix)
+                return prefix[0:index]
+
+
 
 if __name__ == '__main__':
-    brute_force()
+    longestCommonPrefix([''])
