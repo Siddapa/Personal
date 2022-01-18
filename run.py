@@ -1,5 +1,6 @@
 import threading
 from time import sleep
+from typing import final
 import keyboard
 import sys
 import cv2 as cv
@@ -119,6 +120,34 @@ def longestCommonPrefix(strs) -> str:
                 return prefix[0:index]
 
 
+def roman_to_int(input):
+    symbols = {
+        'I' : 1,
+        'V' : 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    }
+    final_num = 0
+
+    for index, char in enumerate(input):
+        previous_num = symbols[input[index - 1]]
+        curr_num = symbols[char]
+
+        if index != 0:
+            if previous_num < curr_num:
+                final_num += curr_num - previous_num
+            else:
+                print(char)
+                final_num += symbols[char]
+        else:
+            final_num += symbols[char]
+    
+    print(final_num)
+
+
 
 if __name__ == '__main__':
-    longestCommonPrefix([''])
+    roman_to_int("MCMXCIV")

@@ -3,13 +3,13 @@ import pickle
 import numpy as np
 import cv2 as cv
 from edge_detect import EdgeDetect
-from plotting.plotter import Plotter
+# from plotting.plotter import Plotter
 
 
 class Server:
-    def __init__(self) -> None:
-        self.address = '127.0.0.1'
-        self.port = 65432        
+    def __init__(self, address, port) -> None:
+        self.address = address
+        self.port = port
         self.packet_size = 10000000
 
     def await_receive(self) -> None:
@@ -21,10 +21,10 @@ class Server:
         self.contours = pickle.loads(data)
     
 
-    def draw(self) -> None:
-        plotter = Plotter(self.contours) 
-        plotter.calibrate()
-        plotter.draw_image()
+    # def draw(self) -> None:
+    #     plotter = Plotter(self.contours) 
+    #     plotter.calibrate()
+    #     plotter.draw_image()
 
     
     def display_contours(self) -> None:
@@ -39,9 +39,9 @@ class Server:
 
 
 class Client:
-    def __init__(self) -> None:
-        self.address = '127.0.0.1'
-        self.port = 65432
+    def __init__(self, address, port) -> None:
+        self.address = address
+        self.port = port
 
     def send(self) -> None:
         tunnel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,7 +53,7 @@ class Client:
     
     def detect_image(self):
         filename = input('Input Filename with Extension: ')
-        working_img = cv.imread('working_files/' + filename)
+        working_img = cv.imread('C:/Users/vishn/Personal/3d_plotter/working_files/' + filename)
 
         detector = EdgeDetect(working_img)
         detector.adjust_image((5, 5))
