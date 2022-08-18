@@ -28,7 +28,7 @@ class Server:
 
     
     def display_contours(self) -> None:
-        black_image = np.zeros((800, 800, 3), dtype = "uint8")
+        black_image = np.zeros((600, 800, 3), dtype = "uint8")
         for contour in self.contours:
             for point in contour:
                 x_coord = point[0][0]

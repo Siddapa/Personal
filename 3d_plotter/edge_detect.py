@@ -6,7 +6,7 @@ class EdgeDetect:
         self.img = img
 
     def adjust_image(self, blur):
-        self.width = 720
+        self.width = 800
         scale_ratio = self.img.shape[1] / self.width
         self.height = int(self.img.shape[0] / scale_ratio)
 
