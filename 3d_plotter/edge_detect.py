@@ -5,6 +5,11 @@ class EdgeDetect:
     def __init__(self, img):
         self.img = img
 
+    """
+    Resizes image to work with dimensions of 3D plotter's bed
+    Width is mandated to 800 pixels and height is scaled
+    proportionally to retain aspect ratio
+    """
     def adjust_image(self, blur):
         self.width = 800
         scale_ratio = self.img.shape[1] / self.width
@@ -16,6 +21,11 @@ class EdgeDetect:
 
         self.img = blur
     
+    """
+    Adjusts thresholds for the Canny filter manually
+    Lower threshold: d increases, a decreases
+    Upper threshold: l increases, j decreases
+    """
     def find_canny_thresh(self):
         self.lower_thresh = 0
         self.upper_thresh = 0

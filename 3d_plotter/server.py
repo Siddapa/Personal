@@ -1,7 +1,11 @@
 from connections import Server
 
 
+"""
+File to be run on the 3D printer and will await for new files
+Hosting IP is set the ip of the device
+"""
 if __name__ == '__main__':
-    server = Server('127.0.0.1', 65432)
+    server = Server()
     server.await_receive()
     server.draw()

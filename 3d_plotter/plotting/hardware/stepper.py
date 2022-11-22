@@ -4,7 +4,10 @@ import RPi.GPIO as gpio
 
 from .sensor import Sensor
 
-
+"""
+Handles movement for the left-to-right stepper motor
+Adjusted by the frequency of on-off pulses from the GPIO
+"""
 class XStepper:
     def __init__(self):
         self.step_pin = 6
@@ -42,7 +45,10 @@ class XStepper:
             gpio.output(self.step_pin, 0)
             sleep(self.base_delay)
 
-
+"""
+Handles movement for the front-to-back stepper motor
+Adjusted by the frequency of on-off pulses from the GPIO
+"""
 class YStepper:
     def __init__(self):
         self.step_pin = 19
@@ -80,7 +86,11 @@ class YStepper:
             gpio.output(self.step_pin, 0)
             sleep(delay)
 
-
+"""
+Handles movement for the up-and-down stepper motor
+Positions are binary where the pen is off or on the paper,
+no variation in between
+"""
 class ZStepper:
     def __init__(self):
         self.step_pin = 0
@@ -96,6 +106,9 @@ class ZStepper:
         self.step_change = 5
         self.base_delay = 0.01
     
+    """
+    Slides down until pen passes the photogate
+    """
     def calibrate(self):
         gpio.output(self.dir_pin, 1) # 0 is up, 1 is down
         while not self.z_sens.detect():

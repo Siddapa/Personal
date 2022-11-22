@@ -17,6 +17,10 @@ class Plotter:
         self.y_stepper.calibrate()
         self.z_stepper.calibrate()
     
+    """
+    Intially raises pen to not draw a line from calibration point to start of image
+    Pen stays down during the duration of a contour until next all points are finished
+    """
     def draw_image(self):
         if not self.z_stepper.lifted:
             self.z_stepper.lift_pen()
@@ -29,6 +33,10 @@ class Plotter:
                 self.move(point[0]) # Nested list
             self.z_stepper.lift_pen()
 
+    """
+    Finds the change in distance between current position and next position
+    Adjusts the front-to-back timing delay for smoother curves (needs to be tested)
+    """
     def move(self, point):
         print(point)
         x_change = point[0] - self.x_stepper.pos

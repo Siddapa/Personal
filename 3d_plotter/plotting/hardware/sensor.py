@@ -1,6 +1,10 @@
 import RPi.GPIO as gpio
 
 
+"""
+Template class one bit digital signal
+Commonly used for touch sensors
+"""
 class Sensor:
     def __init__(self, pin):
         self.pin = pin

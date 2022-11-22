@@ -3,15 +3,20 @@ import pickle
 import numpy as np
 import cv2 as cv
 from edge_detect import EdgeDetect
-# from plotting.plotter import Plotter
+from plotting.plotter import Plotter
 
 
 class Server:
     def __init__(self) -> None:
-        self.address = '192.168.68.135'
+        # Needs to self host since serving data
+        self.address = '0.0.0.0'
         self.port = 65432
         self.packet_size = 4096
 
+    """
+    Waits for contour data from OpenCV
+    Decodes data and stores as self.contours
+    """
     def await_receive(self) -> None:
         tunnel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print('Awaiting Connection...')
@@ -28,6 +33,9 @@ class Server:
         print('Data Received')
 
 
+    """
+    Runs the plotter functions to move the arm itself
+    """
     def draw(self) -> None:
         plotter = Plotter(self.contours)
         print('Calibrating...')
@@ -36,6 +44,11 @@ class Server:
         plotter.draw_image()
 
 
+    """
+    Redraws the contours on a blank numpy array to ensure data
+    received matche the data sent
+    Purely for debuggin purposes
+    """
     def display_contours(self) -> None:
         black_image = np.zeros((600, 800, 3), dtype = "uint8")
         for contour in self.contours:
@@ -49,9 +62,13 @@ class Server:
 
 class Client:
     def __init__(self, address, port) -> None:
+        # Needs to be adjustable since server ip can change based on DHCP
         self.address = address
         self.port = port
 
+    """
+    Dumps contour data over socket
+    """
     def send(self) -> None:
         tunnel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tunnel.connect((self.address, self.port))
@@ -60,6 +77,9 @@ class Client:
         data = pickle.dumps(contours)
         tunnel.send(data)
 
+    """
+    Runns Canny image filter (edge detector) for specficed image
+    """
     def detect_image(self):
         filename = input('Input Filename with Extension: ')
         working_img = cv.imread('C:/Users/vishn/Personal/3d_plotter/working_files/' + filename)
