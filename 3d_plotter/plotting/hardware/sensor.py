@@ -13,3 +13,4 @@ class Sensor:
     def detect(self):
         if gpio.input(self.pin) == 1:
             return True
+        return False

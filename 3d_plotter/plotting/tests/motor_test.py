@@ -9,17 +9,21 @@ pinouts = {
     'z_dir': 5,
     'z_step': 0
 }
-SPR = 200
-delay = 0.01
+SPR = 100
+delay = 0.001
+axis = 'y'
+step_pin = axis + '_step'
+dir_pin = axis + '_dir'
 
 g.setmode(g.BCM)
-for pin in pinouts.values():
-    g.setup(pin, g.OUT)
+g.setup(pinouts[step_pin], g.OUT)
+g.setup(pinouts[dir_pin], g.OUT)
 
+g.output(pinouts[dir_pin], g.HIGH)
 for i in range(SPR):
-    g.output(pinouts['y_step'], g.HIGH)
+    g.output(pinouts[step_pin], g.HIGH)
     sleep(delay)
-    g.output(pinouts['y_step'], g.LOW)
+    g.output(pinouts[step_pin], g.LOW)
     sleep(delay)
 
 g.cleanup()

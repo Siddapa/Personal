@@ -7,6 +7,7 @@ from .sensor import Sensor
 """
 Handles movement for the left-to-right stepper motor
 Adjusted by the frequency of on-off pulses from the GPIO
+Range of 1400 ticks with 1 being left and 0 being right
 """
 class XStepper:
     def __init__(self):
@@ -24,12 +25,7 @@ class XStepper:
         self.base_delay = 0.01
     
     def calibrate(self):
-        gpio.output(self.dir_pin, 0) # 0 is left, 1 is Right
-        while not self.x_sens.detect():
-            gpio.output(self.step_pin, 1)
-            sleep(self.base_delay)
-            gpio.output(self.step_pin, 0)
-            sleep(self.base_delay)
+        self.move(100, 0)
         self.pos = 0
         print('X Axis Calibrated')
     
@@ -48,6 +44,7 @@ class XStepper:
 """
 Handles movement for the front-to-back stepper motor
 Adjusted by the frequency of on-off pulses from the GPIO
+Range of _ ticks with 1 towards the front and 0 towards the back
 """
 class YStepper:
     def __init__(self):
@@ -65,16 +62,12 @@ class YStepper:
         self.base_delay = 0.005
     
     def calibrate(self):
-        gpio.output(self.dir_pin, 1) # 0 is back, 1 is forward
-        while not self.y_sens.detect():
-            gpio.output(self.step_pin, 1)
-            sleep(self.base_delay * 4)
-            gpio.output(self.step_pin, 0)
-            sleep(self.base_delay * 4)
+        self.move(100, 1, self.base_delay)
         self.pos = 0
         print('Y Axis Calibrated')
 
-    def move(self, steps, delay):
+    def move(self, steps, dir, delay):
+        # 0 is back, 1 is forward
         if dir == 1:
             gpio.output(self.dir_pin, 0)
         elif dir == -1:
@@ -110,12 +103,6 @@ class ZStepper:
     Slides down until pen passes the photogate
     """
     def calibrate(self):
-        gpio.output(self.dir_pin, 1) # 0 is up, 1 is down
-        while not self.z_sens.detect():
-            gpio.output(self.step_pin, 1)
-            sleep(self.base_delay)
-            gpio.output(self.step_pin, 0)
-            sleep(self.base_delay)
         self.pos = 0
         print('Z Axis Calibrated')
 
@@ -131,6 +118,7 @@ class ZStepper:
         self.lifted = False
     
     def move(self, steps, delay):
+        # 0 is up, 1 is down
         for i in range(steps):
             gpio.output(self.step_pin, 1)
             sleep(delay)

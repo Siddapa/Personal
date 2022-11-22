@@ -35,10 +35,11 @@ class Server:
 
     """
     Runs the plotter functions to move the arm itself
+    Calibration is handled manually and confirmed by the touch sensor
     """
     def draw(self) -> None:
         plotter = Plotter(self.contours)
-        print('Calibrating...')
+        print('Power off the printer and set axes to endpoints')
         plotter.calibrate()
         print('Drawing Image...')
         plotter.draw_image()
