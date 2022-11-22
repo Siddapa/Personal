@@ -22,11 +22,4 @@ for i in range(SPR):
     g.output(pinouts['y_step'], g.LOW)
     sleep(delay)
 
-g.output(pinouts['y_dir'], g.LOW)
-for i in range(SPR):
-    g.output(pinouts['y_step'], g.HIGH)
-    sleep(delay)
-    g.output(pinouts['y_step'], g.LOW)
-    sleep(delay)
-
 g.cleanup()

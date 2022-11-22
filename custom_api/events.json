@@ -1,0 +1,16 @@
+{
+    "0": {
+        "name": "string",
+        "date": "string",
+        "time": "string",
+        "tod": "string",
+        "all_day": true
+    },
+    "1": {
+        "name": "Vamsi",
+        "date": "blah2",
+        "time": "blah3",
+        "tod": "blah4",
+        "all_day": true
+    }
+}

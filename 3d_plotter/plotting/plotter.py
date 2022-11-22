@@ -1,4 +1,5 @@
 from threading import Thread
+from math import copysign
 import RPi.GPIO as gpio
 
 from plotting.hardware.stepper import XStepper, YStepper, ZStepper
@@ -10,7 +11,6 @@ class Plotter:
         self.x_stepper = XStepper()
         self.y_stepper = YStepper()
         self.z_stepper = ZStepper()
-        gpio.setmode(gpio.BCM)
     
     def calibrate(self):
         self.x_stepper.calibrate()
@@ -30,13 +30,16 @@ class Plotter:
             self.z_stepper.lift_pen()
 
     def move(self, point):
+        print(point)
         x_change = point[0] - self.x_stepper.pos
         y_change = point[1] - self.y_stepper.pos
         slope = y_change / x_change
-        y_delay = self.y_stepper.base_delay * slope
+        y_delay = self.y_stepper.base_delay * abs(slope)
+        x_dir = copysign(1, x_change)
+        y_dir = copysign(1, y_change)
 
-        x_thread = Thread(target=self.x_stepper.move, args=[x_change])
-        y_thread = Thread(target=self.y_stepper.move, args=[y_change, y_delay])
+        x_thread = Thread(target=self.x_stepper.move, args=[x_change, x_dir])
+        y_thread = Thread(target=self.y_stepper.move, args=[y_change, y_delay, y_dir])
         x_thread.start()
         y_thread.start()
         x_thread.join()

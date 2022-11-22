@@ -1,10 +1,13 @@
+from re import sub
 import threading
 from time import sleep
+from typing import final
 import keyboard
 import sys
 import cv2 as cv
 from math import pi, sin, cos
 from math import factorial as f
+import random
 
 from webcam.sockets import Server
 from webcam.sockets import Client
@@ -119,6 +122,102 @@ def longestCommonPrefix(strs) -> str:
                 return prefix[0:index]
 
 
+def roman_to_int(input):
+    symbols = {
+        'I' : 1,
+        'V' : 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    }
+    final_num = 0
+
+    for index, char in enumerate(input):
+        previous_num = symbols[input[index - 1]]
+        curr_num = symbols[char]
+
+        if index != 0:
+            if previous_num < curr_num:
+                final_num += curr_num - previous_num
+            else:
+                print(char)
+                final_num += symbols[char]
+        else:
+            final_num += symbols[char]
+    
+    print(final_num)
+
+
+def sid():
+    total = 0
+    for i in range(17, 24):
+        total += 50/(f(i)*f(50-i))
+    total *= 2
+    total += 50/(f(25)*f(25))
+    total /= 2
+    print(total)
+
+
+def budy(row):
+    for i in range(row):
+        printable = [' ' for j in range(row)]
+        index = int(((row - 1) / 2) + 1)
+        for j in range(i):
+            printable[index + j] = '.'
+        print(printable)
+
+
+def has_repeating(test: str):
+    for index, i in enumerate(test):
+        try:
+            blah = test[index + 1:].index(i)
+            return True
+        except ValueError:
+            continue
+    return False
+
+
+def repeating_string(substring: str, pointer: int, size: int):
+    print(substring[pointer:pointer + size])
+    if has_repeating(substring[pointer:pointer + size]):
+        if pointer + size == len(substring):
+            repeating_string(substring, 0, size - 1)
+        else:
+            pointer += 1
+    return size
+
+
+def wordle():
+    guessing = True
+    words = ["Gene_symbol", "Validated", "Supported", "Approved", "Uncertain"]
+
+    correct_word = words[random.randint(0, len(words) - 1)]
+    print(correct_word)
+    guess = input('Guess: ')
+
+    while guessing:
+        guess = input('Try Again: ')
+        if guess.lower() == correct_word.lower():
+            print('Correct')
+            break
+        continue
+
+
+def typingtest():
+    sleep(3)
+    test = 'child world look not develop however leave day course change consider good man how ask word keep which give course school under mean like could this such would lead and nation large see may'
+    for i in test:
+        keyboard.press(i)
+        sleep(0.03)
+
 
 if __name__ == '__main__':
-    longestCommonPrefix([''])
+    # roman_to_int("MCMXCIV")
+    # budy(5)
+    # test = "abcabcbb"
+    # blah = repeating_string(test, 0, len(test))
+    # print(blah)
+    # wordle()
+    typingtest()
