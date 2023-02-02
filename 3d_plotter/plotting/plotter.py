@@ -1,8 +1,6 @@
 from threading import Thread
 from math import copysign
-import RPi.GPIO as gpio
-from hardware.sensor import Sensor
-from time import sleep
+# import RPi.GPIO as gpio
 
 from plotting.hardware.stepper import XStepper, YStepper, ZStepper
 
@@ -21,7 +19,7 @@ class Plotter:
         self.x_stepper.calibrate()
         self.y_stepper.calibrate()
         self.z_stepper.calibrate()
-    
+
     """
     Intially raises pen to not draw a line from calibration point to start of image
     Pen stays down during the duration of a contour until next all points are finished
