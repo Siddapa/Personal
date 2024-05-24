@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Shape",
+            "request": "launch",
+            "mainClass": "Shape",
+            "projectName": "Personal_feb6d6e8"
+        },
+        {
+            "type": "java",
+            "name": "Launch BoundedGeneric",
+            "request": "launch",
+            "mainClass": "BoundedGeneric",
+            "projectName": "Personal_feb6d6e8"
+        },
+        {
+            "type": "java",
             "name": "Launch Run",
             "request": "launch",
             "mainClass": "Run",

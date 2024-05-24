@@ -1,6 +1,5 @@
 from multiprocessing import Process, Queue
 from math import copysign
-import RPi.GPIO as gpio
 from time import sleep
 from plotting.hardware.stepper import XStepper, YStepper, ZStepper
 from plotting.hardware.sensor import Sensor
@@ -13,7 +12,6 @@ class Plotter:
         self.x_stepper = XStepper()
         self.y_stepper = YStepper()
         self.z_stepper = ZStepper()
-        gpio.setwarnings(False)
     
 
     def calibrate(self):
@@ -24,7 +22,6 @@ class Plotter:
         self.y_stepper.calibrate()
         self.z_stepper.calibrate()
         print()
-    
 
     """
     Intially raises pen to not draw a line from calibration point to start of image
