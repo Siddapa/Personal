@@ -8,4 +8,6 @@ Hosting IP is set the ip of the device
 if __name__ == '__main__':
     server = Server()
     server.await_receive()
+    # server.display_contours()
+    # server.output_coordinates()
     server.draw()

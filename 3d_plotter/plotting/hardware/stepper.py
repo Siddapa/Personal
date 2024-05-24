@@ -16,30 +16,41 @@ class XStepper:
         self.sensor_pin = 16
 
         gpio.setmode(gpio.BCM)
+        gpio.setwarnings(False)
         gpio.setup(self.step_pin, gpio.OUT)
         gpio.setup(self.dir_pin, gpio.OUT)
         self.x_sens = Sensor(self.sensor_pin)
 
         self.pos = 0
+        self.target_pos = 0
         self.max_steps = 0
-        self.base_delay = 0.01
+        self.base_delay = 0.002
+        self.direction = 0
     
     def calibrate(self):
-        self.move(100, 0)
+        # self.move(100, 0)
         self.pos = 0
         print('X Axis Calibrated')
     
-    def move(self, steps, dir):
-        if dir == 1:
+    def move(self, steps, direction):
+        if direction == 1:
             gpio.output(self.dir_pin, 1)
-        elif dir == -1:
+        elif direction == -1:
             gpio.output(self.dir_pin, 0)
+        self.direction = direction
+        self.target_pos = steps
 
-        for i in range(steps):
+    def update(self, ret_queue):
+        while self.pos != self.target_pos:
             gpio.output(self.step_pin, 1)
             sleep(self.base_delay)
             gpio.output(self.step_pin, 0)
             sleep(self.base_delay)
+            
+            self.pos += self.direction
+            # print('X', self.pos)
+        ret_queue.put(self)
+
 
 """
 Handles movement for the front-to-back stepper motor
@@ -53,36 +64,54 @@ class YStepper:
         self.sensor_pin = 21
 
         gpio.setmode(gpio.BCM)
+        gpio.setwarnings(False)
         gpio.setup(self.step_pin, gpio.OUT)
         gpio.setup(self.dir_pin, gpio.OUT)
         self.y_sens = Sensor(self.sensor_pin)
 
         self.pos = 0
         self.max_steps = 0
-        self.base_delay = 0.005
+        self.base_delay = 0.002
+        self.target_pos = 0
+        self.target_delay = 0
+        self.direction = 0
     
     def calibrate(self):
-        self.move(100, 1, self.base_delay)
+        # self.move(100, 1, self.base_delay)
         self.pos = 0
         print('Y Axis Calibrated')
 
-    def move(self, steps, dir, delay):
+    def move(self, steps, direction, delay):
         # 0 is back, 1 is forward
-        if dir == 1:
+        if direction == -1:
             gpio.output(self.dir_pin, 0)
-        elif dir == -1:
+        elif direction == 1:
             gpio.output(self.dir_pin, 1)
-
-        for i in range(steps):
+        self.target_pos = steps
+        self.target_delay = delay
+        self.direction = direction
+    
+    """
+    Moves the designated distance set by move()
+    Returns true if target reached
+    """
+    def update(self, ret_queue):
+        while self.pos != self.target_pos:
             gpio.output(self.step_pin, 1)
-            sleep(delay)
+            sleep(self.target_delay)
             gpio.output(self.step_pin, 0)
-            sleep(delay)
+            sleep(self.target_delay)
+
+            self.pos += self.direction
+            # print('Y', self.pos)
+        ret_queue.put(self)
+
 
 """
 Handles movement for the up-and-down stepper motor
 Positions are binary where the pen is off or on the paper,
 no variation in between
+1 is down, 0 is up
 """
 class ZStepper:
     def __init__(self):
@@ -92,18 +121,18 @@ class ZStepper:
         self.lifted = False
 
         gpio.setmode(gpio.BCM)
+        gpio.setwarnings(False)
         gpio.setup(self.step_pin, gpio.OUT)
         gpio.setup(self.dir_pin, gpio.OUT)
         self.z_sens = Sensor(self.sensor_pin)
         
-        self.step_change = 5
+        self.step_change = 20
         self.base_delay = 0.01
     
-    """
-    Slides down until pen passes the photogate
-    """
+
     def calibrate(self):
         self.pos = 0
+        self.lifted = False
         print('Z Axis Calibrated')
 
 

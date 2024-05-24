@@ -4,6 +4,7 @@ import numpy as np
 import cv2 as cv
 from edge_detect import EdgeDetect
 from plotting.plotter import Plotter
+from matplotlib import pyplot as plt
 
 
 class Server:
@@ -39,9 +40,13 @@ class Server:
     """
     def draw(self) -> None:
         plotter = Plotter(self.contours)
+
         print('Power off the printer and set axes to endpoints')
+        print()
         plotter.calibrate()
+
         print('Drawing Image...')
+        print()
         plotter.draw_image()
 
 
@@ -57,8 +62,17 @@ class Server:
                 x_coord = point[0][0]
                 y_coord = point[0][1]
                 black_image[y_coord, x_coord] = [0, 255, 0]
-        cv.imshow('Plot', black_image)
-        cv.waitKey(0)
+        plt.imshow(black_image, interpolation='nearest')
+        plt.show()
+        # cv.imshow('Plot', black_image)
+        # cv.waitKey(0)
+
+
+    def output_coordinates(self) -> None:
+        for contour in self.contours:
+            for point in contour:
+                print(point)
+            print()
 
 
 class Client:
