@@ -5,6 +5,7 @@ import cv2 as cv
 from edge_detect import EdgeDetect
 from plotting.plotter import Plotter
 from matplotlib import pyplot as plt
+import os
 
 
 class Server:
@@ -97,7 +98,7 @@ class Client:
     """
     def detect_image(self):
         filename = input('Input Filename with Extension: ')
-        working_img = cv.imread('C:/Users/vishn/Personal/3d_plotter/working_files/' + filename)
+        working_img = cv.imread(os.getcwd() + '/drawables/' + filename)
 
         detector = EdgeDetect(working_img)
         detector.adjust_image((5, 5))

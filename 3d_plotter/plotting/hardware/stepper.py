@@ -1,7 +1,6 @@
 from time import sleep
 import keyboard
-# import RPi.GPIO as gpio
-
+import RPi.GPIO as gpio
 from .sensor import Sensor
 
 """
