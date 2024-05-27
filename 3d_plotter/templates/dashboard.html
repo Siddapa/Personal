@@ -1,0 +1,143 @@
+<html>
+    <body>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>
+            function select_img(img_name) {
+                $("#select_img").attr("src", "static/" + img_name)
+            }
+            function update_range(thresh_type, value) {
+                $.ajax({
+                    type: "POST",
+                    url: "/gen-canny-img",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        "img_name": $("#select_img").attr("src"),
+                        "lower_thresh": $("#lower_thresh").val(),
+                        "upper_thresh": $("#upper_thresh").val()
+                    }),
+                    success: function(data, status, request) {
+                        $("#canny_img").attr("src", "static/__canny_temp.png?" + new Date().getTime())
+                        $("#display_" + thresh_type + "_thresh").val(value)
+                    },
+                    error: function() {
+                        alert("Some Error")
+                    }
+                })
+            }
+            function submit_job() {
+                $.ajax({
+                    type: "POST",
+                    url: "/submit-job",
+                    success: function(data, status, request) {
+                        update_status(request.getResponseHeader("Location"))
+                    },
+                    error: function() {
+                        alert("Some Error")
+                    }
+                })
+            }
+            function update_status(fetch_status_url) {
+                $.getJSON(fetch_status_url, function(data) {
+                    console.log(data["state"])
+                    if (data["state"] != "FINISHED") {
+                        if (data["state"] == "DRAWING") {
+                            $("#contours_completed").text(data["contours_completed"])
+                            $("#total_contours").text(data["total_contours"])
+                            $("#x_pos").text(data["positions"]["x_pos"])
+                            $("#x_target").text(data["positions"]["x_target"])
+                            $("#y_pos").text(data["positions"]["y_pos"])
+                            $("#y_target").text(data["positions"]["y_target"])
+                        }
+                        setTimeout(function() {
+                            update_status(fetch_status_url)
+                        }, 1000)
+                    }
+                })
+            }
+        </script>
+        
+        <div class="row" style="display:flex">
+            <div class="column" style="flex:75%">
+                <h1>Library</h1>
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="file" name="new_img">
+                    <input type="submit" value="Upload">
+                </form>
+                <div></div>
+                <div style="overflow-y:auto">
+                    <table>
+                        <tbody>
+                            {% for row in images %}
+                                <tr>
+                                    {% for img in row %}
+                                        <td>
+                                            <div>
+                                                <img id="gallery" src="static/{{img}}" onclick="select_img('{{img}}')" style="width:100px">
+                                            </div>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <br>
+
+                <h1>Edit Image</h1>
+                <div>
+                    <div style="display: inline-block">
+                        <h3>Selected Image</h3>
+                        <img id="select_img" style="width:5in">
+                    </div>
+                    <div style="display: inline-block">
+                        <h3>Canny Image</h3>
+                        <img id="canny_img" style="width:5in">
+                    </div>
+                </div>
+                <div>
+                    <div style="display: inline-block">
+                        <h5>Lower Threshold</h5>
+                        <input id="lower_thresh" type="range" min="0" max="255" value="0" oninput="update_range('lower', this.value)">
+                        <output id="display_lower_thresh">0</output>
+                    </div>
+                    <div style="display: inline-block">
+                        <h5>Upper Threshold</h5>
+                        <input id="upper_thresh" type="range" min="0" max="255" value="0" oninput="update_range('upper', this.value)">
+                        <output id="display_upper_thresh">0</output>
+                    </div>
+                    <div style="display: inline-block">
+                        <button onclick="submit_job()">Draw Image!</button>
+                    </div>
+                </div>
+            </div>
+            <div class="column" style="flex:25%">
+                <h1>Print Status</h1>
+                <div class="row" id="progress">
+                    <span style="font-weight:bold">Contours Completed: </span>
+                    <span id="contours_completed">0</span>
+                    <span> / </span>
+                    <span id="total_contours">0</span>
+                </div>
+                <div class="row" id="positions">
+                    <div>
+                        <span style="font-weight:bold">X Pos: </span>
+                        <span id="x_pos">0</span>
+                    </div>
+                    <div>
+                        <span style="font-weight:bold">X Target: </span>
+                        <span id="x_target">0</span>
+                    </div>
+                    <div>
+                        <span style="font-weight:bold">Y Pos: </span>
+                        <span id="y_pos">0</span>
+                    </div>
+                    <div>
+                        <span style="font-weight:bold">Y Target: </span>
+                        <span id="y_target">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

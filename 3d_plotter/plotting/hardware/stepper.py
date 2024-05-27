@@ -29,7 +29,6 @@ class XStepper:
     def calibrate(self):
         # self.move(100, 0)
         self.pos = 0
-        print('X Axis Calibrated')
     
     def move(self, steps, direction):
         if direction == 1:
@@ -76,9 +75,7 @@ class YStepper:
         self.direction = 0
     
     def calibrate(self):
-        # self.move(100, 1, self.base_delay)
         self.pos = 0
-        print('Y Axis Calibrated')
 
     def move(self, steps, direction, delay):
         # 0 is back, 1 is forward
@@ -102,7 +99,6 @@ class YStepper:
             sleep(self.target_delay)
 
             self.pos += self.direction
-            # print('Y', self.pos)
         ret_queue.put(self)
 
 

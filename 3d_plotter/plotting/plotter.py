@@ -7,8 +7,9 @@ from reprint import output
 
 
 class Plotter:
-    def __init__(self, contours):
+    def __init__(self, contours, telemetry):
         self.contours = contours
+        self.telemetry = telemetry
         self.x_stepper = XStepper()
         self.y_stepper = YStepper()
         self.z_stepper = ZStepper()
@@ -16,12 +17,13 @@ class Plotter:
 
     def calibrate(self):
         confirmation = Sensor(20) # Touch sensor from z axis
+        self.telemetry.update_state(state='CALIBRATING', meta={})
         while not confirmation.detect():
             sleep(0.1)
         self.x_stepper.calibrate()
         self.y_stepper.calibrate()
         self.z_stepper.calibrate()
-        print()
+        self.telemetry.update_state(state='CALIBRATED', meta={})
 
     """
     Intially raises pen to not draw a line from calibration point to start of image
@@ -36,9 +38,17 @@ class Plotter:
                 for point in contour:
                     self.move(point[0]) # Nested list
 
-                    output_lines['Percent Completed'] = f'{str(index/len(self.contours) * 100)}'
-                    output_lines['Contours Completed'] = f'{index} / {len(self.contours)}'
-                    output_lines['Positions'] = f'X_Pos - {self.x_stepper.pos}, Y_Pos - {self.y_stepper.pos}, X_Target - {self.x_stepper.target_pos}, Y_Target - {self.y_stepper.target_pos}'
+                    meta_data = {
+                        'total_contours': len(self.contours),
+                        'contours_compeleted': index,
+                        'positions': {
+                            'x_pos': self.x_stepper.pos,
+                            'x_target': self.x_stepper.target_pos,
+                            'y_pos': self.y_stepper.pos,
+                            'y_target': self.y_stepper.target_pos
+                        }
+                    }
+                    self.telemetry.update_state(state='DRAWING',  meta=meta_data)
 
                     # percent_completed = f'Percent Completed: {str(int(index/len(self.contours)))}'
                     # contours_completed = f'Contours Completed: {str(index)} / {str(len(self.contours))}'
