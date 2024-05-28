@@ -128,7 +128,6 @@ class ZStepper:
     def calibrate(self):
         self.pos = 0
         self.lifted = False
-        print('Z Axis Calibrated')
 
 
     def lift_pen(self):

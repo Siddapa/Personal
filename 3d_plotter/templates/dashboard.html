@@ -4,8 +4,11 @@
         <script>
             function select_img(img_name) {
                 $("#select_img").attr("src", "static/" + img_name)
+                $("#lower_thresh").prop("disabled", false)
+                $("#upper_thresh").prop("disabled", false)
             }
             function update_range(thresh_type, value) {
+                $("#save_canny_img").prop("disabled", false)
                 $.ajax({
                     type: "POST",
                     url: "/gen-canny-img",
@@ -24,33 +27,57 @@
                     }
                 })
             }
-            function submit_job() {
+            function update_job_state(new_state) {
                 $.ajax({
                     type: "POST",
-                    url: "/submit-job",
+                    url: "/update-job",
+                    contentType: "application/json",
+                    data: JSON.stringify({"next_state": new_state}),
                     success: function(data, status, request) {
-                        update_status(request.getResponseHeader("Location"))
+                        if (new_state == "START") {
+                            update_status()
+                            $("#start").prop("disabled", true)
+                            $("#toggle").prop("disabled", false)
+                            $("#stop").prop("disabled", false)
+                        } else if (new_state == "PAUSE") {
+                            $("#toggle").html("Resume")
+                        } else if (new_state == "RESUME") {
+                            $("#toggle").html("Pause")
+                        } else if (new_state == "CALIBRATE") {
+                            $("#calibrate").prop("disabled", true)
+                            $("#start").prop("disabled", false)
+                        } else if (new_state == "INIT PLOTTER") {
+                            $("#save_canny_img").prop("disabled", true)
+                            $("#lower_thresh").prop("disabled", true)
+                            $("#upper_thresh").prop("disabled", true)
+                            $("#calibrate").prop("disabled", false)
+                        } else if (new_state == "STOP") {
+                            $("#toggle").prop("disabled", true)
+                            $("#stop").prop("disabled", true)
+                            $("save_canny_img").prop("disabled", false)
+                            $("#lower_thresh").prop("disabled", false)
+                            $("#upper_thresh").prop("disabled", false)
+                        }
                     },
                     error: function() {
                         alert("Some Error")
                     }
                 })
             }
-            function update_status(fetch_status_url) {
-                $.getJSON(fetch_status_url, function(data) {
-                    console.log(data["state"])
-                    if (data["state"] != "FINISHED") {
+            function update_status() {
+                $.getJSON('/status', function(data) {
+                    if (data["state"] != "FINISHED" && data['state'] != "ABORTED") {
                         if (data["state"] == "DRAWING") {
                             $("#contours_completed").text(data["contours_completed"])
                             $("#total_contours").text(data["total_contours"])
-                            $("#x_pos").text(data["positions"]["x_pos"])
-                            $("#x_target").text(data["positions"]["x_target"])
-                            $("#y_pos").text(data["positions"]["y_pos"])
-                            $("#y_target").text(data["positions"]["y_target"])
+                            $("#x_pos").text(data["x_pos"])
+                            $("#x_target").text(data["x_target"])
+                            $("#y_pos").text(data["y_pos"])
+                            $("#y_target").text(data["y_target"])
                         }
                         setTimeout(function() {
-                            update_status(fetch_status_url)
-                        }, 1000)
+                            update_status()
+                        }, 2000)
                     }
                 })
             }
@@ -98,21 +125,21 @@
                 <div>
                     <div style="display: inline-block">
                         <h5>Lower Threshold</h5>
-                        <input id="lower_thresh" type="range" min="0" max="255" value="0" oninput="update_range('lower', this.value)">
+                        <input id="lower_thresh" type="range" min="1" max="255" value="0" oninput="update_range('lower', this.value)" disabled>
                         <output id="display_lower_thresh">0</output>
                     </div>
                     <div style="display: inline-block">
                         <h5>Upper Threshold</h5>
-                        <input id="upper_thresh" type="range" min="0" max="255" value="0" oninput="update_range('upper', this.value)">
+                        <input id="upper_thresh" type="range" min="1" max="255" value="0" oninput="update_range('upper', this.value)" disabled>
                         <output id="display_upper_thresh">0</output>
                     </div>
-                    <div style="display: inline-block">
-                        <button onclick="submit_job()">Draw Image!</button>
+                    <div>
+                        <button id="save_canny_img" onclick="update_job_state('INIT PLOTTER')" disabled>Save Canny Image</button>
                     </div>
                 </div>
             </div>
             <div class="column" style="flex:25%">
-                <h1>Print Status</h1>
+                <h1>Plot Status</h1>
                 <div class="row" id="progress">
                     <span style="font-weight:bold">Contours Completed: </span>
                     <span id="contours_completed">0</span>
@@ -136,6 +163,12 @@
                         <span style="font-weight:bold">Y Target: </span>
                         <span id="y_target">0</span>
                     </div>
+                </div>
+                <div class="row" id="controls">
+                    <button id="calibrate" onclick="update_job_state('CALIBRATE')" disabled>Calibrate</button>
+                    <button id="start" onclick="update_job_state('START')" disabled>Start</button>
+                    <button id="toggle" onclick="update_job_state(this.innerHTML.toUpperCase())" disabled>Pause</button>
+                    <button id="stop" onclick="update_job_state('STOP')" disabled>Stop</button>
                 </div>
             </div>
         </div>

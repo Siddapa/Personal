@@ -10,26 +10,25 @@ class Plotter:
     def __init__(self, contours, telemetry):
         self.contours = contours
         self.telemetry = telemetry
+        self.paused = False
         self.x_stepper = XStepper()
         self.y_stepper = YStepper()
         self.z_stepper = ZStepper()
-    
 
     def calibrate(self):
-        confirmation = Sensor(20) # Touch sensor from z axis
-        self.telemetry.update_state(state='CALIBRATING', meta={})
-        while not confirmation.detect():
-            sleep(0.1)
+        self.telemetry['state'] = 'CALIBRATING'
         self.x_stepper.calibrate()
         self.y_stepper.calibrate()
         self.z_stepper.calibrate()
-        self.telemetry.update_state(state='CALIBRATED', meta={})
+        self.telemetry['state'] = 'CALIBRATED'
 
     """
     Intially raises pen to not draw a line from calibration point to start of image
     Pen stays down during the duration of a contour until next all points are finished
     """
-    def draw_image(self):
+    def draw_image(self, next_state):
+        self.telemetry['state'] = 'DRAWING'
+
         if not self.z_stepper.lifted:
             self.z_stepper.lift_pen()
         
@@ -38,17 +37,12 @@ class Plotter:
                 for point in contour:
                     self.move(point[0]) # Nested list
 
-                    meta_data = {
-                        'total_contours': len(self.contours),
-                        'contours_compeleted': index,
-                        'positions': {
-                            'x_pos': self.x_stepper.pos,
-                            'x_target': self.x_stepper.target_pos,
-                            'y_pos': self.y_stepper.pos,
-                            'y_target': self.y_stepper.target_pos
-                        }
-                    }
-                    self.telemetry.update_state(state='DRAWING',  meta=meta_data)
+                    self.telemetry['total_contours'] = len(self.contours)
+                    self.telemetry['contours_compeleted'] = index
+                    self.telemetry['x_pos'] = int(self.x_stepper.pos)
+                    self.telemetry['x_target'] = int(self.x_stepper.target_pos)
+                    self.telemetry['y_pos'] = int(self.y_stepper.pos)
+                    self.telemetry['y_target'] = int(self.y_stepper.target_pos)
 
                     # percent_completed = f'Percent Completed: {str(int(index/len(self.contours)))}'
                     # contours_completed = f'Contours Completed: {str(index)} / {str(len(self.contours))}'
@@ -74,6 +68,14 @@ class Plotter:
 
                     if self.z_stepper.lifted:
                         self.z_stepper.drop_pen()
+
+                    while next_state.value == 3:
+                        if not self.z_stepper.lifted:
+                            self.z_stepper.lift_pen()
+                        sleep(0.1)
+                    if next_state.value == 5:
+                        self.telemetry['state'] = 'ABORTED'
+                        exit()
                 self.z_stepper.lift_pen()
 
 
@@ -84,7 +86,7 @@ class Plotter:
     def move(self, point):
         x_change = point[0] - self.x_stepper.pos
         y_change = point[1] - self.y_stepper.pos
-        slope = x_change / y_change if y_change == 0 else 1
+        slope = (x_change / y_change) if y_change != 0 else 1
         y_delay = self.y_stepper.base_delay * abs(slope)
         x_dir = copysign(1, x_change)
         y_dir = copysign(1, y_change)

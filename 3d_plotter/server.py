@@ -3,7 +3,10 @@ from flask import Flask, render_template, flash, request, redirect, url_for, ses
 from werkzeug.utils import secure_filename
 import cv2 as cv
 from edge_detect import adjust_image, save_canny_img, find_contours
-from celery import Celery
+from multiprocessing import Process, Manager, Value
+from plotting.plotter import Plotter
+from time import sleep
+from ctypes import c_wchar_p
 
 
 UPLOAD_FOLDER = 'static/'
@@ -11,7 +14,8 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 app.secret_key = b'f89hsad8fh032n39f'
-celery = Celery(app.name, broker='redis://localhost:6379/0', backend='redis://localhost:6379/0', task_ignore_result=False)
+plot_state = Manager().dict()
+next_state = Value('i', -1)
 
 
 def fetch_img_filenames(wrap_size=5):
@@ -24,39 +28,44 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/status/<task_id>', methods=['GET'])
-def task_status(task_id):
-    task = run_plotter.AsyncResult(task_id)
-    if task.state == 'DRAWING':
-        response = {
-            'state': task.state,
-            'total_contours': task.info.get('total_contours'),
-            'contours_completed': task.info.get('contours_completed'),
-            'positions': task.info.get('positions')
-        }
-    else:
-        response = {
-            'state': task.state
-        }
-    return jsonify(response)
-
-
-@celery.task(bind=True)
-def run_plotter(self):
-    working_img = cv.imread('/home/pi/personal/3d_plotter/static/__canny_temp.png', cv.IMREAD_GRAYSCALE)
-    print(working_img.dtype)
-    print(working_img.shape)
+def run_job():
+    working_img = cv.imread(UPLOAD_FOLDER + '__canny_temp.png', cv.IMREAD_GRAYSCALE)
     contours = find_contours(working_img)
-    plotter = Plotter(contours, telemetry=self)
-    plotter.calibrate()
-    plotter.draw()
-    return {'state': 'FINISHED'}
+    plotter = Plotter(contours, plot_state)
+    while 1:
+        if next_state.value == 1:
+            plotter.calibrate()
+        elif next_state.value == 2:
+            plotter.draw_image(next_state)
+            break
+        next_state.value = -1
+        sleep(0.01)
+    plot_state['state'] = 'FINISHED'
 
 
-@app.route('/submit-job', methods=['POST'])
-def submit_job():
-    task = run_plotter.apply_async()
-    return jsonify({}), 202, {'Location': url_for('task_status', task_id=task.id)}
+@app.route('/status', methods=['GET'])
+def status():
+    return jsonify(dict(plot_state))
+
+
+@app.route('/update-job', methods=['POST'])
+def update_job():
+    new_state = request.json['next_state']
+    if new_state == 'INIT PLOTTER':
+        task = Process(target=run_job)
+        task.start()
+        next_state.value = 0
+    elif new_state == 'CALIBRATE':
+        next_state.value = 1
+    elif new_state == 'START':
+        next_state.value = 2
+    elif new_state == 'PAUSE':
+        next_state.value = 3
+    elif new_state == 'RESUME':
+        next_state.value = 4
+    elif new_state == 'STOP':
+        next_state.value = 5
+    return jsonify({}), 202, {}
 
 
 @app.route('/gen-canny-img', methods=['POST'])
