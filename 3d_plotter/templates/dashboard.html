@@ -2,6 +2,9 @@
     <body>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script>
+            $(document).ready(function() {
+                update_status()
+            })
             function select_img(img_name) {
                 $("#select_img").attr("src", "static/" + img_name)
                 $("#lower_thresh").prop("disabled", false)
@@ -35,7 +38,6 @@
                     data: JSON.stringify({"next_state": new_state}),
                     success: function(data, status, request) {
                         if (new_state == "START") {
-                            update_status()
                             $("#start").prop("disabled", true)
                             $("#toggle").prop("disabled", false)
                             $("#stop").prop("disabled", false)
@@ -54,7 +56,7 @@
                         } else if (new_state == "STOP") {
                             $("#toggle").prop("disabled", true)
                             $("#stop").prop("disabled", true)
-                            $("save_canny_img").prop("disabled", false)
+                            $("#save_canny_img").prop("disabled", false)
                             $("#lower_thresh").prop("disabled", false)
                             $("#upper_thresh").prop("disabled", false)
                         }

@@ -74,6 +74,14 @@ class Plotter:
                             self.z_stepper.lift_pen()
                         sleep(0.1)
                     if next_state.value == 5:
+                        self.move([0, 0])
+                        ret_queue = Queue()
+                        x_process = Process(target=self.x_stepper.update, args=(ret_queue,))
+                        y_process = Process(target=self.y_stepper.update, args=(ret_queue,))
+                        x_process.start()
+                        y_process.start()
+                        x_process.join()
+                        y_process.join()
                         self.telemetry['state'] = 'ABORTED'
                         exit()
                 self.z_stepper.lift_pen()

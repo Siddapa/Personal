@@ -121,7 +121,7 @@ class ZStepper:
         gpio.setup(self.dir_pin, gpio.OUT)
         self.z_sens = Sensor(self.sensor_pin)
         
-        self.step_change = 20
+        self.step_change = 40
         self.base_delay = 0.01
     
 
