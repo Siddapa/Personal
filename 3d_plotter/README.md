@@ -12,3 +12,5 @@ Most deployments would benefit from running this as a Linux systemd process for 
 python server.py
 ```
 From here, the webpage is accessed over a local network at: **deployed machine's IP:65432**
+
+![image](https://github.com/user-attachments/assets/c3ae0733-9b06-46d8-930c-306cc6f999a6)
